@@ -56,3 +56,4 @@ class TechnicalResearchAgent(BaseAgent):
 
 
 technical_research_agent = TechnicalResearchAgent()
+

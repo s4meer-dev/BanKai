@@ -39,3 +39,4 @@ erDiagram
 11. **`artifacts`**: Verified deliverable files (`.xlsx`, `.docx`, `.pptx`, `.pdf`, `.html`).
 12. **`memory_items`**: 4-tier persistent memory items with vector embeddings for semantic retrieval.
 13. **`audit_logs`**: System security and access audit events.
+

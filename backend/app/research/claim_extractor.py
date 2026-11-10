@@ -79,3 +79,4 @@ class ClaimExtractor:
 
 
 claim_extractor = ClaimExtractor()
+

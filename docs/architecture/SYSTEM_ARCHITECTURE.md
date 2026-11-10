@@ -315,3 +315,4 @@ sequenceDiagram
     Orchestrator->>API: emit("execution.completed", {artifact_url: "..."})
     API-->>UI: data: {"event": "execution.completed", "artifact_url": "..."}
 ```
+

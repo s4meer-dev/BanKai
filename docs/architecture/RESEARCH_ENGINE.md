@@ -35,3 +35,4 @@ Where:
 - $R$: **Mean Source Reliability** (Publisher integrity and domain reputation metrics)
 - $V$: **Verification Rate** (Ratio of corroborated to unverified assertions)
 - $D$: **Contradiction Resolution Rate** (Penalty for unreconciled conflicting statements)
+

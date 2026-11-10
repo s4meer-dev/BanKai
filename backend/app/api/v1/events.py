@@ -41,3 +41,4 @@ async def stream_workflow_events(
             "X-Accel-Buffering": "no",
         },
     )
+

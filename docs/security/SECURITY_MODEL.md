@@ -14,3 +14,4 @@ BAN KAI implements defense-in-depth across authentication, code execution, input
 | **Secret & Credential Leakage** | Critical | Environment variables are isolated; `.env` excluded from version control; frontend bundles communicate strictly via backend gateway proxies. |
 | **Credential Attacks & Hijacking** | High | Direct bcrypt password hashing with salt; JWT tokens signed with HS256 and expiry enforcement. |
 | **Denial of Service via Loops** | Medium | LangGraph `recursion_limit` and `MAX_ORCHESTRATION_CYCLES` deterministic ceilings. |
+

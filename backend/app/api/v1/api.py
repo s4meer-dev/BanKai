@@ -14,3 +14,4 @@ api_router.include_router(eal.router, prefix="/eal", tags=["Evidence-to-Action L
 api_router.include_router(memory.router, prefix="/memory", tags=["Memory Engine"])
 api_router.include_router(execution.router, prefix="/execution", tags=["Execution & Artifacts"])
 api_router.include_router(events.router, prefix="/events", tags=["Real-time Events"])
+

@@ -53,3 +53,4 @@ flowchart TD
 | **6. Verification** | Fact checking, contradiction resolution, RQS calculation | `claims`, `sources` | `verification_results`, `rqs` | Heuristic / Adversarial |
 | **7. Strategy** | Action roadmap, risk tiering (`LOW`/`MED`/`HIGH`) | `claims`, `rqs` | `recommendations`, `plans` | Pydantic |
 | **8. Execution** | Production artifact compilation in isolated sandbox | `plans`, `data_analysis` | `artifacts`, `execution_results` | openpyxl, docx, pptx, reportlab |
+

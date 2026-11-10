@@ -41,3 +41,4 @@ class Task(Base):
     project = relationship("Project", back_populates="tasks")
     agent_runs = relationship("AgentRun", back_populates="task", cascade="all, delete-orphan")
     claims = relationship("ResearchClaim", back_populates="task")
+

@@ -46,3 +46,4 @@ subprocess.run(['echo', 'pwned'])
     is_safe, violations = validate_python_code(subp_code)
     assert is_safe is False
     assert any("subprocess" in v for v in violations)
+

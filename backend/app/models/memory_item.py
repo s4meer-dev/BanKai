@@ -36,3 +36,4 @@ class MemoryItem(Base):
     # Relationships
     project = relationship("Project", back_populates="memories")
     user = relationship("User", back_populates="memories")
+

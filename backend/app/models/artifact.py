@@ -32,3 +32,4 @@ class Artifact(Base):
     # Relationships
     project = relationship("Project", back_populates="artifacts")
     execution_action = relationship("ExecutionAction", back_populates="artifacts")
+

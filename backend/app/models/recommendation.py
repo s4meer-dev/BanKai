@@ -33,3 +33,4 @@ class Recommendation(Base):
     # Relationships
     project = relationship("Project", back_populates="recommendations")
     plans = relationship("ExecutionPlan", back_populates="recommendation", cascade="all, delete-orphan")
+

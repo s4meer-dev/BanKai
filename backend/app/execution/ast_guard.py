@@ -58,3 +58,4 @@ def validate_python_code(code_str: str) -> Tuple[bool, List[str]]:
         return True, []
     except SyntaxError as e:
         return False, [f"Syntax error in code: {e}"]
+

@@ -63,3 +63,4 @@ async def get_project_quality_score(
             f"Contradictions detected: {graph.contradicted_claims}",
         ],
     )
+

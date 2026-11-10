@@ -32,3 +32,4 @@ class VerificationResult(Base):
 
     # Relationships
     claim = relationship("ResearchClaim", back_populates="verification_results")
+

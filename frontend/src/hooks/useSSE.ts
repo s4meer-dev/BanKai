@@ -59,3 +59,4 @@ export function useSSE(projectId?: string) {
     };
   }, [projectId, addLiveEvent, setIsConnectedSSE]);
 }
+

@@ -73,3 +73,4 @@ async def health_check():
         "search_provider": settings.DEFAULT_SEARCH_PROVIDER,
         "sandbox_mode": settings.SANDBOX_MODE,
     }
+

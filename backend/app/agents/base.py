@@ -78,3 +78,4 @@ class BaseAgent(abc.ABC):
     ) -> Dict[str, Any]:
         """Internal execution logic overridden by specialized agents."""
         pass
+

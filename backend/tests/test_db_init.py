@@ -17,3 +17,4 @@ async def test_database_initialization():
         result = await session.execute(select(User))
         users = result.scalars().all()
         assert isinstance(users, list)
+

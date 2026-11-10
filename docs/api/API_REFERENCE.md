@@ -44,3 +44,4 @@ Base URL: `http://localhost:8000/api/v1`
 
 ## 8. Real-time Events (`/events`)
 - `GET /events/stream?project_id={id}`: Server-Sent Events (SSE) live telemetry stream.
+

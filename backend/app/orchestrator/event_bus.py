@@ -89,3 +89,4 @@ class EventBus:
 
 # Global singleton instance
 event_bus = EventBus()
+

@@ -27,3 +27,4 @@
 - **Status:** Accepted
 - **Context:** Requires a minimal, dark graphite SaaS interface with live interactive workflow graphing.
 - **Decision:** Selected Next.js 15 with React Flow (`@xyflow/react`), Tailwind CSS, and TanStack Query, connecting to backend real-time Server-Sent Events (SSE).
+

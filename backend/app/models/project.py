@@ -42,3 +42,4 @@ class Project(Base):
     memories = relationship("MemoryItem", back_populates="project", cascade="all, delete-orphan")
     artifacts = relationship("Artifact", back_populates="project", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="project", cascade="all, delete-orphan")
+

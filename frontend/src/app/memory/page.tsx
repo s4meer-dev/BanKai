@@ -262,3 +262,4 @@ export default function MemoryCenterPage() {
     </div>
   );
 }
+

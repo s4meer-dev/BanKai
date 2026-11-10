@@ -61,3 +61,4 @@ async def list_sources(
     stmt = select(ResearchSource).where(ResearchSource.project_id == project_id).order_by(ResearchSource.created_at.desc())
     result = await db.execute(stmt)
     return result.scalars().all()
+

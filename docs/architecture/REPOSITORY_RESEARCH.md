@@ -225,3 +225,4 @@ Every technology is analyzed across:
 | **Execution** | BanKai Secure Local Sandbox | E2B Code Interpreter | Direct arbitrary shell execution (Forbidden) |
 | **Frontend** | Next.js 15, React 19, Tailwind, React Flow, TanStack Query | Tremor, Framer Motion | Legacy dashboard templates |
 | **Telemetry** | Langfuse SDK, OpenTelemetry, Structured Logs | Prometheus / Grafana | Monolithic APMs |
+

@@ -69,3 +69,4 @@ async def init_db() -> None:
         logger.info(f"Initializing database schemas with engine: {engine.url.drivername}")
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database schemas verified.")
+

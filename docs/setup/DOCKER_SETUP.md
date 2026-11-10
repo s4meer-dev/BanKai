@@ -29,3 +29,4 @@ docker compose logs -f backend
 - **Swagger API Docs:** `http://localhost:8000/docs`
 - **PostgreSQL 16 + pgvector:** `localhost:5432`
 - **Redis Cache & Queue:** `localhost:6379`
+

@@ -35,3 +35,4 @@ class ResearchSource(Base):
     # Relationships
     project = relationship("Project", back_populates="sources")
     claims = relationship("ResearchClaim", back_populates="source", cascade="all, delete-orphan")
+

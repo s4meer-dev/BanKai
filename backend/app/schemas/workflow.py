@@ -37,3 +37,4 @@ class WorkflowStatusResponse(BaseModel):
     research_quality_score: float = 0.0
     pending_approvals: List[Dict[str, Any]] = []
     error: Optional[str] = None
+

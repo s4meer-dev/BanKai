@@ -38,3 +38,4 @@ flowchart TD
 3. **Executive Presentations (`.pptx`):** Multi-slide corporate briefings via `python-pptx`.
 4. **Publication Reports (`.pdf`):** Tables, quality metrics, and evidence tables via `reportlab`.
 5. **Interactive Visualizations (`.html`):** Dynamic responsive bar and scatter plots via `plotly`.
+

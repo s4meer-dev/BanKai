@@ -39,3 +39,4 @@ class ExecutionPlan(Base):
     project = relationship("Project", back_populates="plans")
     recommendation = relationship("Recommendation", back_populates="plans")
     actions = relationship("ExecutionAction", back_populates="plan", cascade="all, delete-orphan")
+

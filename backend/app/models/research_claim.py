@@ -41,3 +41,4 @@ class ResearchClaim(Base):
     verification_results = relationship(
         "VerificationResult", back_populates="claim", cascade="all, delete-orphan"
     )
+

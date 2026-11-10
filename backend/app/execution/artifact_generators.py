@@ -253,3 +253,4 @@ class ArtifactGenerator:
 
 
 artifact_generator = ArtifactGenerator()
+

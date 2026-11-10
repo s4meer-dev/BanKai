@@ -79,3 +79,4 @@ async def list_execution_plans(
     stmt = select(ExecutionPlan).where(ExecutionPlan.project_id == project_id).order_by(ExecutionPlan.created_at.desc())
     result = await db.execute(stmt)
     return result.scalars().all()
+

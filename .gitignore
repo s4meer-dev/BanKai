@@ -58,6 +58,8 @@ out/
 *.sqlite3
 postgres_data/
 redis_data/
+storage/
+scratch/
 backend/storage/
 backend/scratch/
 artifacts/
@@ -72,3 +74,4 @@ Desktop.ini
 .vscode/
 *.swp
 *.swo
+

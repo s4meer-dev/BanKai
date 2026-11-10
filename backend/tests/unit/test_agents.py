@@ -124,3 +124,4 @@ async def test_execution_agent():
     )
     assert "generated_artifacts" in out
     assert len(out["generated_artifacts"]) >= 4  # xlsx, docx, pptx, pdf
+

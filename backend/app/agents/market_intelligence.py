@@ -62,3 +62,4 @@ class MarketIntelligenceAgent(BaseAgent):
 
 
 market_intelligence_agent = MarketIntelligenceAgent()
+

@@ -59,3 +59,4 @@ class EmbeddingProvider:
 
 
 embedding_provider = EmbeddingProvider()
+

@@ -188,3 +188,4 @@ async def test_scenario_7_project_memory_retrieval():
         )
         assert len(matches) > 0
         assert "LangGraph" in matches[0].content
+

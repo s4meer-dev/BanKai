@@ -30,3 +30,4 @@ class AuditLog(Base):
 
     # Relationships
     project = relationship("Project", back_populates="audit_logs")
+

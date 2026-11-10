@@ -55,3 +55,4 @@ class AgentState(TypedDict, total=False):
     final_report: Dict[str, Any]
     workflow_status: str  # PENDING | RUNNING | WAITING_FOR_APPROVAL | COMPLETED | FAILED
     error: Optional[str]
+

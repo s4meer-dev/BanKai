@@ -44,3 +44,4 @@ async def get_current_user(
         await db.commit()
         await db.refresh(default_user)
     return default_user
+

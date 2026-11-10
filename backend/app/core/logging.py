@@ -47,3 +47,4 @@ def setup_logging(level: str = "INFO", log_format: str = "json") -> None:
 
 
 logger = logging.getLogger("bankai")
+

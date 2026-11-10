@@ -56,3 +56,4 @@ class DataAnalystAgent(BaseAgent):
 
 
 data_analyst_agent = DataAnalystAgent()
+

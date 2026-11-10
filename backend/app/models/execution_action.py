@@ -36,3 +36,4 @@ class ExecutionAction(Base):
     # Relationships
     plan = relationship("ExecutionPlan", back_populates="actions")
     artifacts = relationship("Artifact", back_populates="execution_action")
+

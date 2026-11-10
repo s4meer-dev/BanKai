@@ -51,3 +51,4 @@ async def test_full_langgraph_workflow_execution():
     assert len(final_state["recommendations"]) > 0
     assert len(final_state["generated_artifacts"]) >= 4
     assert "final_report" in final_state
+

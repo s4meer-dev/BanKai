@@ -27,3 +27,4 @@ flowchart LR
 1. **Zero Hallucinated Provenance:** No recommendation can exist in the ledger without pointing to foreign keys in `research_claims`.
 2. **Immutable Content Hashing:** Web sources are hashed with SHA-256 at crawl time to prevent source drift.
 3. **Traceable Rejections:** Rejected or disputed assertions are recorded with rationales rather than silently discarded.
+

@@ -40,3 +40,4 @@ class EALQualityScoreResponse(BaseModel):
     contradiction_resolution_rate: float  # 0.0 to 1.0
     recency_score: float  # 0.0 to 1.0
     scoring_notes: List[str]
+

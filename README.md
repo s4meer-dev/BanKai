@@ -186,3 +186,4 @@ cd backend
 ## License
 
 MIT License &copy; 2026 s4meer-dev. All rights reserved.
+

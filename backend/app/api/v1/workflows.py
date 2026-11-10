@@ -185,3 +185,4 @@ async def approve_workflow_plan(
     await db.commit()
 
     return {"status": "approval_registered", "approved": approval.approved}
+
