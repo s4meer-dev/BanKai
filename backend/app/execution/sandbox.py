@@ -59,13 +59,23 @@ class ExecutionSandbox:
                 temp_file = f.name
                 f.write(code)
 
-            # Step 3: Run in subprocess with timeout
+            # Step 3: Run in subprocess with timeout and sanitized environment
+            clean_env = {
+                "PATH": os.environ.get("PATH", ""),
+                "SYSTEMROOT": os.environ.get("SYSTEMROOT", "C:\\Windows"),
+                "WINDIR": os.environ.get("WINDIR", "C:\\Windows"),
+                "TEMP": self.scratch_dir,
+                "TMP": self.scratch_dir,
+                "PYTHONPATH": os.environ.get("PYTHONPATH", ""),
+            }
+
             process = await asyncio.create_subprocess_exec(
                 sys.executable,
                 temp_file,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=self.scratch_dir,
+                env=clean_env,
             )
 
             try:
@@ -77,7 +87,11 @@ class ExecutionSandbox:
                 exit_code = process.returncode or 0
                 status = "SUCCESS" if exit_code == 0 else "FAILED"
             except asyncio.TimeoutError:
-                process.kill()
+                try:
+                    process.kill()
+                    await process.wait()
+                except Exception:
+                    pass
                 stdout = ""
                 stderr = f"Execution exceeded maximum timeout of {timeout} seconds."
                 exit_code = -1

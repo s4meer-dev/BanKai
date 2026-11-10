@@ -24,3 +24,4 @@ Write-Host "    - Frontend:  http://localhost:3000" -ForegroundColor White
 Write-Host "    - API Docs:  http://localhost:8000/docs" -ForegroundColor White
 Write-Host "    - EAL Graph: http://localhost:3000/eal" -ForegroundColor White
 Write-Host "`nPress Ctrl+C or close the terminal windows to terminate." -ForegroundColor Yellow
+

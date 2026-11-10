@@ -47,3 +47,43 @@ subprocess.run(['echo', 'pwned'])
     assert is_safe is False
     assert any("subprocess" in v for v in violations)
 
+
+def test_dunder_subclass_traversal_blocked():
+    """Verifies that Python MRO and subclass traversal exploits are blocked by AST."""
+    dunder_code = """
+x = ().__class__.__bases__[0].__subclasses__()
+"""
+    is_safe, violations = validate_python_code(dunder_code)
+    assert is_safe is False
+    assert any("__subclasses__" in v or "__bases__" in v for v in violations)
+
+
+def test_importlib_blocked():
+    """Verifies dynamic module loading via importlib is strictly blocked."""
+    importlib_code = """
+import importlib
+mod = importlib.import_module("os")
+"""
+    is_safe, violations = validate_python_code(importlib_code)
+    assert is_safe is False
+    assert any("importlib" in v for v in violations)
+
+
+def test_network_egress_modules_blocked():
+    """Verifies that unauthorized outbound networking libraries are forbidden."""
+    for mod in ["requests", "httpx", "urllib"]:
+        code = f"import {mod}"
+        is_safe, violations = validate_python_code(code)
+        assert is_safe is False, f"Module {mod} was unexpectedly allowed"
+
+
+def test_validate_or_raise_helper():
+    from app.execution.ast_guard import SecurityViolationError, validate_or_raise
+
+    with pytest.raises(SecurityViolationError):
+        validate_or_raise("import sys; sys.exit(1)")
+
+    # Should not raise
+    validate_or_raise("x = 42\ny = x * 2")
+
+

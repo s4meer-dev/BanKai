@@ -173,8 +173,22 @@ async def final_synthesis_node(state: AgentState) -> Dict[str, Any]:
 
 
 # ==============================================================================
-# Conditional Edge Router
+# Conditional Edge Routers
 # ==============================================================================
+
+def verification_router(state: AgentState) -> Literal["research_node", "strategy_node"]:
+    """Determines whether additional corroborating research is required."""
+    rqs = state.get("research_quality_score", 100.0)
+    iterations = state.get("iteration_count", 1)
+    max_iter = state.get("max_iterations", 5)
+    disputed = state.get("disputed_claims", [])
+
+    # If severe contradictions or low quality score and iterations remain, loop back for deeper research
+    if rqs < 50.0 and len(disputed) > 0 and iterations < max_iter:
+        logger.info(f"Verification detected RQS {rqs:.1f} with {len(disputed)} disputed claims. Looping back to research (cycle {iterations}).")
+        return "research_node"
+    return "strategy_node"
+
 
 def approval_router(state: AgentState) -> Literal["execution_node", "final_synthesis_node"]:
     """Determines if execution proceeds or halts at approval gate."""
@@ -215,7 +229,16 @@ def create_workflow_graph() -> StateGraph:
     graph.add_edge("market_intel", "tech_research")
     graph.add_edge("tech_research", "data_analyst")
     graph.add_edge("data_analyst", "verification")
-    graph.add_edge("verification", "strategy")
+    
+    # Conditional edge: verification can loop back to research if quality threshold not met
+    graph.add_conditional_edges(
+        "verification",
+        verification_router,
+        {
+            "research_node": "research",
+            "strategy_node": "strategy",
+        },
+    )
 
     # Conditional routing based on human approval gate
     graph.add_conditional_edges(

@@ -22,7 +22,13 @@ class DuckDuckGoSearchProvider(BaseSearchProvider):
 
     async def search(self, query: str, num_results: int = 5) -> List[SearchResult]:
         try:
-            from duckduckgo_search import DDGS
+            import warnings
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*duckduckgo_search.*")
+                try:
+                    from ddgs import DDGS
+                except ImportError:
+                    from duckduckgo_search import DDGS
 
             results: List[SearchResult] = []
             ddgs = DDGS()

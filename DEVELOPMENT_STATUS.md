@@ -29,8 +29,8 @@
 
 ## 2. Test Verification Summary
 
-- **Backend Test Suite:** 25 passed (`100% pass rate`)
-  - Unit Tests: AST guard, all 8 individual agents.
+- **Backend Test Suite:** 34 passed (`100% pass rate in 43.0s`)
+  - Unit Tests: AST guard (including dunder subclass traversal, importlib, and network egress blocks), prompt injection filters, LangGraph cyclical routers, artifact generator edge cases, and all 8 individual agents.
   - Integration Tests: FastAPI routes, database schema init, LangGraph StateGraph execution.
   - End-to-End Tests:
     - Scenario 1: Business Market Research
@@ -42,9 +42,10 @@
     - Scenario 7: Project Vector Memory Semantic Retrieval
 - **Frontend Build Verification:** Next.js 15 production build compiled with zero errors (`15/15 static routes generated`).
 - **Subsystem Smoke Test:** `scripts/smoke_test.py` validated all 6 platform subsystems (Database, AST Guard, Execution Sandbox, Research Engine, 4-tier Vector Memory, EAL & Artifacts).
-- **Interactive Live Demonstration:** `scripts/demo_pipeline.py` validated end-to-end multi-agent execution in 4.29s (8 web sources, 33 claims, 50 EAL nodes, 95.5 RQS score, and 5 executive deliverables: XLSX, DOCX, PPTX, PDF, HTML).
+- **Interactive Live Demonstration:** `scripts/demo_pipeline.py` validated end-to-end multi-agent execution in 5.43s (8 web sources, 39 claims, 56 EAL nodes, 95.5 RQS score, and 5 executive deliverables: XLSX, DOCX, PPTX, PDF, HTML).
 - **Production CLI Utility:** `backend/bankai_cli.py` tested and validated for headless command-line objective execution.
 - **Unified Startup Launcher:** `start_bankai.ps1` provisioned for dual-process concurrent orchestration.
+- **Database Migrations:** Complete 13-table Alembic migration script (`98bfc94eabe9_initial_schema.py`) verified against ORM schema with `alembic upgrade head`.
 
 ---
 

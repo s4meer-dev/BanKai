@@ -137,9 +137,33 @@ docker compose up --build -d
 
 ---
 
+## CLI & Headless Pipeline Execution
+
+BAN KAI includes native command-line and automation interfaces:
+
+### 1. Headless CLI Tool
+Execute research and execution workflows directly from the terminal without a browser:
+```bash
+python backend/bankai_cli.py --objective "Assess the viability of Rust WebAssembly AI Inference on Edge CDN in 2026" --domain technical --depth comprehensive
+```
+
+### 2. Live Multi-Agent Demonstration Pipeline
+Run the complete 8-agent lifecycle with real web crawling, claim verification, RQS calculation, and deliverable generation:
+```bash
+python scripts/demo_pipeline.py
+```
+
+### 3. Platform Subsystem Smoke Test
+Fast smoke test validating database ORM, AST security guard, execution sandbox, research crawler, 4-tier memory, and artifact compilation:
+```bash
+python scripts/smoke_test.py
+```
+
+---
+
 ## Test Suite Execution
 
-Run the complete 25-test suite covering unit tests, integration tests, API routes, and all 7 end-to-end scenarios:
+Run the complete 34-test suite covering unit tests, security AST guard evasion attempts, prompt injection filtering, cyclical graph routing, deliverable generation, integration tests, and all 7 end-to-end scenarios:
 
 ```bash
 cd backend

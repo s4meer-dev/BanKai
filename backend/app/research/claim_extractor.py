@@ -1,5 +1,6 @@
-"""Factual claim extraction and citation association engine."""
+"""Factual claim extraction, sanitization, and prompt-injection defense engine."""
 
+import html
 import re
 import uuid
 from typing import Dict, List
@@ -7,10 +8,20 @@ from app.core.logging import logger
 
 
 class ClaimExtractor:
-    """Extracts atomic factual claims from source texts with evidence excerpts."""
+    """Extracts atomic factual claims from source texts with evidence excerpts and adversarial filtering."""
+
+    ADVERSARIAL_INJECTION_PATTERNS = [
+        re.compile(r"ignore\s+(all|the|previous|prior|above)\s+(instructions|prompts|rules|commands)", re.IGNORECASE),
+        re.compile(r"system\s+override", re.IGNORECASE),
+        re.compile(r"developer\s+mode", re.IGNORECASE),
+        re.compile(r"you\s+are\s+now\s+(an?\s+unrestricted|a\s+new|dan)", re.IGNORECASE),
+        re.compile(r"(format\s+[a-z]:|rm\s+-rf|drop\s+database|drop\s+table)", re.IGNORECASE),
+        re.compile(r"(<script|javascript:|onerror=|onload=)", re.IGNORECASE),
+        re.compile(r"disregard\s+safety\s+guidelines", re.IGNORECASE),
+    ]
 
     def extract_claims(self, source_record: dict) -> List[Dict]:
-        """Parses source text into distinct claims associated with evidence excerpts."""
+        """Parses source text into distinct claims associated with evidence excerpts, sanitizing adversarial payloads."""
         content = source_record.get("content", "")
         url = source_record.get("url", "")
         title = source_record.get("title", "")
@@ -33,7 +44,15 @@ class ClaimExtractor:
 
         seen_claims = set()
         for s in sentences:
-            s_clean = s.strip()
+            s_clean = html.unescape(s.strip())
+            # Strip residual HTML tags to prevent XSS injection
+            s_clean = re.sub(r"<[^>]+>", "", s_clean).strip()
+
+            # Security: Prompt Injection Guard
+            if self._is_adversarial_injection(s_clean):
+                logger.warning(f"Adversarial prompt-injection attempt detected and neutralized from {url}: {s_clean[:80]}...")
+                continue
+
             # Require minimum length and factual keyword or numeric data
             if len(s_clean) >= 40 and len(s_clean) <= 400:
                 has_keyword = any(kw in s_clean.lower() for kw in informative_keywords)
@@ -63,20 +82,30 @@ class ClaimExtractor:
         # Fallback if no specific sentences matched
         if not claims and len(content) > 30:
             first_sentence = sentences[0].strip() if sentences else content[:150]
-            claims.append({
-                "id": str(uuid.uuid4()),
-                "claim_text": first_sentence,
-                "evidence_excerpt": first_sentence,
-                "source_url": url,
-                "source_title": title,
-                "publisher": publisher,
-                "confidence_score": 0.50,
-                "verification_status": "UNVERIFIED",
-            })
+            first_clean = html.unescape(first_sentence)
+            first_clean = re.sub(r"<[^>]+>", "", first_clean).strip()
 
-        logger.info(f"Extracted {len(claims)} claims from source {url}")
+            if not self._is_adversarial_injection(first_clean):
+                claims.append({
+                    "id": str(uuid.uuid4()),
+                    "claim_text": first_clean,
+                    "evidence_excerpt": first_clean,
+                    "source_url": url,
+                    "source_title": title,
+                    "publisher": publisher,
+                    "confidence_score": 0.50,
+                    "verification_status": "UNVERIFIED",
+                })
+
+        logger.info(f"Extracted {len(claims)} sanitized claims from source {url}")
         return claims
+
+    def _is_adversarial_injection(self, text: str) -> bool:
+        """Evaluates whether candidate text contains prompt injection or adversarial jailbreak triggers."""
+        for pattern in self.ADVERSARIAL_INJECTION_PATTERNS:
+            if pattern.search(text):
+                return True
+        return False
 
 
 claim_extractor = ClaimExtractor()
-

@@ -148,3 +148,4 @@ async def execute_cli(objective: str, domain: str, depth: str, auto_approve: boo
 
 if __name__ == "__main__":
     main()
+
