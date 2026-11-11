@@ -1,64 +1,83 @@
-# Skills & Agents Foundation
+# Unified Agent Skills & Intelligence Foundation
 
-A modern, production-grade development foundation configured with the complete professional engineering skill suites and agent personas from:
-- **Addy Osmani** ([`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills))
-- **Matt Pocock** ([`mattpocock/skills`](https://github.com/mattpocock/skills))
-
-This repository provides an autonomous, real-engineering environment that turns any coding agent (Antigravity, Claude Code, Cursor, Copilot, Codex) into a disciplined senior engineering team.
-
----
-
-## What is Included
-
-### 1. 64 Engineering Skills (`.agents/skills/`)
-
-#### **Software Architecture & Domain Modeling**
-- `codebase-design`: Deep module boundaries, high cohesion, low coupling, avoiding shallow wrappers.
-- `domain-modeling`: Expressive types, state machines, algebraic domain definitions.
-- `api-and-interface-design`: Clean, ergonomic, type-safe API boundaries.
-- `improve-codebase-architecture`: Refactoring spaghetti into modular systems.
-
-#### **Specification & Planning**
-- `spec-driven-development` & `to-spec`: Clear requirements and acceptance criteria before writing code.
-- `grill-me`, `grilling`, `grill-with-docs`: Interactive architectural stress-testing to eliminate ambiguity.
-- `planning-and-task-breakdown` & `to-tickets`: Phased execution roadmaps with verification gates.
-- `idea-refine` & `interview-me`: Divergent and convergent ideation to sharpen fuzzy requirements.
-
-#### **Implementation & Quality**
-- `incremental-implementation` & `implement-spec`: Thin, verifiable slices with continuous compilation.
-- `tdd` & `test-driven-development`: Red-Green-Refactor loop, edge-case coverage, zero mock pollution.
-- `code-simplification`: Ruthless elimination of dead code, over-engineering, and premature abstractions.
-- `diagnosing-bugs` & `debugging-and-error-recovery`: Scientific hypothesis testing; no blind guesswork.
-
-#### **Frontend & UI Engineering**
-- `frontend-ui-engineering`: Minimalist, human-crafted design language (Linear/Raycast aesthetic, dark-mode zinc palette, zero neon AI badge clutter, accessible WCAG standards).
-- `browser-testing-with-devtools`: Real-browser profiling, console inspection, visual verification.
-
-#### **Security, Performance & Operations**
-- `security-and-hardening`: Defensive boundaries, AST validation, prompt injection defense, sanitized I/O.
-- `performance-optimization`: Profiling, Core Web Vitals, query optimization, bundle reduction.
-- `observability-and-instrumentation`: Structured logging, tracing, metrics, actionable error reporting.
-- `ci-cd-and-automation`, `git-workflow-and-versioning`, `shipping-and-launch`.
+A production-grade, multi-agent development foundation uniting four industry-standard skill suites, plugins, and agent personas:
+- **Addy Osmani** ([`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills)) — Senior production engineering, performance, clean UI, code simplification, security, and verification.
+- **Matt Pocock** ([`mattpocock/skills`](https://github.com/mattpocock/skills)) — Real engineering, domain modeling, codebase design, deep modules, test-driven development, and architectural rigor.
+- **Understand Anything** ([`Egonex-AI/Understand-Anything`](https://github.com/Egonex-AI/Understand-Anything)) — Multi-agent codebase comprehension, interactive knowledge graphs, file tours, diff impact analysis, and domain extraction.
+- **Agentic Awesome Skills (AAS)** ([`sickn33/agentic-awesome-skills`](https://github.com/sickn33/agentic-awesome-skills)) — AI agents & MCP building, RAG engineering, modern full-stack patterns (Next.js, React, Tailwind, Shadcn, PostgreSQL), and on-demand discovery across 2,955+ skills.
 
 ---
 
-### 2. Staff Agent Personas (`.agents/agents/`)
-- **`code-reviewer.md`**: Evaluates changes across 5 dimensions (Correctness, Readability, Architecture, Security, Performance).
-- **`security-auditor.md`**: Dedicated vulnerability detection, threat modeling, and input hardening.
-- **`test-engineer.md`**: Comprehensive test matrices, property testing, and regression analysis.
-- **`web-performance-auditor.md`**: Core Web Vitals, payload profiling, and rendering latency.
-
----
-
-## Engineering Lifecycle
-
-All work adheres to the real-engineering loop:
+## Workspace Architecture
 
 ```text
+├── .agents/
+│   ├── agents/                     # 14 Staff Agent Personas
+│   │   ├── architecture-analyzer.md# System architecture & topology
+│   │   ├── code-reviewer.md        # Staff-level 5D code review
+│   │   ├── domain-analyzer.md      # Business domain & state machines
+│   │   ├── security-auditor.md     # AST security & threat modeling
+│   │   ├── test-engineer.md        # Comprehensive test matrices
+│   │   ├── tour-builder.md         # Guided onboarding & module tours
+│   │   ├── web-performance-auditor.md # Core Web Vitals & payload profiling
+│   │   └── ... (7 more personas)
+│   │
+│   ├── skills/                     # 102 Active Playbooks
+│   │   ├── [Understand Anything]   # understand, understand-chat, understand-diff, understand-domain, understand-explain...
+│   │   ├── [AAS Modern Stack]      # ai-agents-architect, mcp-builder, rag-engineer, langgraph, react-best-practices, nextjs-app-router-patterns, shadcn, tailwind-patterns, ui-ux-pro-max...
+│   │   ├── [Addy Osmani Suite]     # frontend-ui-engineering, code-simplification, spec-driven-development, security-and-hardening, performance-optimization...
+│   │   └── [Matt Pocock Suite]     # codebase-design, domain-modeling, diagnosing-bugs, improve-codebase-architecture, tdd, grill-me...
+│   │
+│   ├── plugins/                    # Integrated Plugins
+│   │   ├── understand-anything/    # Codebase knowledge graph generator, parser, AST analysis, visual dashboard
+│   │   └── aas-plugin/             # Local discovery engine for 2,955+ skills
+│   │
+│   └── aas/                        # Local Catalog Database
+│       ├── catalog.json            # 2,955 indexed playbooks
+│       ├── skills_index.json       # Fast keyword index
+│       └── editorial-bundles.json  # Curated capability bundles
+│
+├── AGENTS.md                       # Intent → Skill execution matrix & anti-rationalization rules
+├── GEMINI.md                       # Antigravity agent configuration
+├── README.md                       # Foundation documentation
+└── .gitignore                      # Safe ignores tracking .agents/
+```
+
+---
+
+## Core Capabilities
+
+### 1. Codebase Comprehension (Understand Anything)
+- **Interactive Knowledge Graphs (`/understand`):** Analyzes any repository to generate dependency and topology graphs in `.ua/knowledge-graph.json`.
+- **Architectural Walkthroughs (`/understand-onboard`):** Automatically synthesizes step-by-step onboarding tours.
+- **Diff Blast-Radius Analysis (`/understand-diff`):** Examines git diffs to forecast architectural impact and breaking changes before merging.
+- **Deep Code Explanation (`/understand-explain`):** Explains functions and modules with visual context.
+
+### 2. Modern Full-Stack & AI Engineering (AAS)
+- **AI Agent & MCP Tooling:** Build Model Context Protocol tools, LangGraph workflows, RAG pipelines, and agent memory with `ai-agents-architect` and `mcp-builder`.
+- **Clean Next.js & React:** Enforce idiomatic App Router patterns, server components, and clean state with `nextjs-app-router-patterns` and `react-best-practices`.
+- **Human-Crafted Minimalist UI:** Zero neon AI noise; sleek pitch-black zinc aesthetic using `frontend-ui-engineering`, `ui-ux-pro-max`, and `shadcn`.
+- **Database Architecture:** Optimized PostgreSQL and relational schemas using `database-architect` and `sql-pro`.
+
+### 3. Real Engineering Discipline (Addy Osmani & Matt Pocock)
+- **Spec First:** `spec-driven-development` and `to-spec` define requirements before coding.
+- **Interrogative Grilling:** `grill-me` challenges architectural assumptions to eliminate rework.
+- **Deep Modules:** `codebase-design` ensures simple interfaces hide rich implementations.
+- **Zero-Guesswork Debugging:** `diagnosing-bugs` requires hypothesis formulation and reproduction tests before touching code.
+- **Ruthless Simplification:** `code-simplification` cuts bloat and unnecessary abstraction layers.
+
+---
+
+## Autonomous Lifecycle
+
+```text
+UNDERSTAND (understand / understand-explain)
+   │
+   ▼
 SPECIFY (to-spec / spec-driven-development)
    │
    ▼
-PLAN (planning-and-task-breakdown)
+PLAN (planning-and-task-breakdown / aas-compose-stack)
    │
    ▼
 BUILD & TEST (incremental-implementation + tdd)
@@ -67,10 +86,10 @@ BUILD & TEST (incremental-implementation + tdd)
 SIMPLIFY (code-simplification)
    │
    ▼
-REVIEW & HARDEN (code-review + security-and-hardening)
+REVIEW & HARDEN (code-review + security-and-hardening + understand-diff)
    │
    ▼
-SHIP (shipping-and-launch)
+SHIP (shipping-and-launch + docker-expert)
 ```
 
 See [`AGENTS.md`](./AGENTS.md) and [`GEMINI.md`](./GEMINI.md) for full configuration details.
