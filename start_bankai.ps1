@@ -17,7 +17,11 @@ Write-Host "[*] Starting FastAPI Backend on http://localhost:8000 ..." -Foregrou
 $backendProcess = Start-Process -FilePath $pythonExe -ArgumentList "-m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload" -WorkingDirectory $backendDir -PassThru
 
 Write-Host "[*] Starting Next.js 15 Frontend on http://localhost:3000 ..." -ForegroundColor Green
-$frontendProcess = Start-Process -FilePath "npm" -ArgumentList "run dev" -WorkingDirectory $frontendDir -PassThru
+$npmCmd = "npm.cmd"
+if (-Not (Get-Command "npm.cmd" -ErrorAction SilentlyContinue)) {
+    $npmCmd = "npm"
+}
+$frontendProcess = Start-Process -FilePath $npmCmd -ArgumentList "run dev -- -p 3000" -WorkingDirectory $frontendDir -PassThru
 
 Write-Host "`n[+] BAN KAI Platform is running!" -ForegroundColor Cyan
 Write-Host "    - Frontend:  http://localhost:3000" -ForegroundColor White
