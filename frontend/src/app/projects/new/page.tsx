@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { PlusCircle, Sparkles, ArrowRight, ShieldCheck, Cpu } from "lucide-react";
+import { Plus, ArrowRight, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useBanKaiStore } from "@/lib/store";
 
@@ -38,7 +38,7 @@ export default function NewProjectPage() {
       setActiveProject(project);
       queryClient.invalidateQueries({ queryKey: ["projects"] });
 
-      // Trigger initial orchestration workflow
+      // Run workflow
       await api.runWorkflow({
         project_id: project.id,
         objective: description || title,
@@ -46,112 +46,115 @@ export default function NewProjectPage() {
         depth,
       });
 
-      router.push("/workflow");
+      router.push(`/workspace?projectId=${project.id}`);
     } catch (err: any) {
-      alert(`Error creating project: ${err.message}`);
+      alert(`Error initializing workspace: ${err.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
-      <div className="border-b border-[#2b3036] pb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-white">Initialize Research Workspace</h1>
-        <p className="text-sm text-gray-400 mt-1">
-          Configure a high-assurance multi-agent workspace for autonomous deep research, factual verification, and execution.
+    <div className="p-8 max-w-2xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="pb-6 border-b border-zinc-800/80">
+        <h1 className="text-xl font-semibold text-zinc-100 tracking-tight">Create Research Project</h1>
+        <p className="text-xs text-zinc-400 mt-1">
+          Set up a new workspace with autonomous agent orchestration and evidence tracking.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title Input */}
-        <div className="space-y-2">
-          <label className="text-xs font-mono text-gray-300 uppercase tracking-wider">Project Title *</label>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-medium text-zinc-300">
+            Project Title
+          </label>
           <input
             type="text"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g., Enterprise Multi-Agent AI Feasibility Study 2026"
-            className="w-full px-4 py-2.5 bg-[#141618] border border-[#2b3036] rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+            placeholder="e.g. Graph Neural Networks Benchmark Study"
+            className="w-full px-3.5 py-2 rounded-md bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
           />
         </div>
 
-        {/* Objective & Description */}
-        <div className="space-y-2">
-          <label className="text-xs font-mono text-gray-300 uppercase tracking-wider">Research Objective & Scope</label>
+        <div className="space-y-1.5">
+          <label className="block text-xs font-medium text-zinc-300">
+            Core Objective & Scope
+          </label>
           <textarea
+            required
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe the core objective, required evidence standards, industry domain, and expected deliverable formats..."
-            className="w-full px-4 py-2.5 bg-[#141618] border border-[#2b3036] rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+            placeholder="Describe what the agents should investigate, evaluate, or model..."
+            className="w-full px-3.5 py-2 rounded-md bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors"
           />
         </div>
 
-        {/* Domain Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-xs font-mono text-gray-300 uppercase tracking-wider">Target Domain</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-zinc-300">
+              Domain
+            </label>
             <select
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
-              className="w-full px-4 py-2.5 bg-[#141618] border border-[#2b3036] rounded-md text-sm text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3 py-2 rounded-md bg-zinc-950 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"
             >
-              <option value="general">Cross-Domain General Intelligence</option>
-              <option value="market">Market Intelligence & Competitive Analysis</option>
-              <option value="technical">Technical Architecture & Engineering Feasibility</option>
-              <option value="data">Quantitative Data & Financial Feasibility</option>
-              <option value="academic">Academic & Scientific Literature</option>
+              <option value="general">General Research</option>
+              <option value="technical">Technical / Software Architecture</option>
+              <option value="business">Business / Market Intelligence</option>
+              <option value="finance">Financial Modeling</option>
+              <option value="academic">Academic Literature</option>
             </select>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-mono text-gray-300 uppercase tracking-wider">Research Depth</label>
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-zinc-300">
+              Research Depth
+            </label>
             <select
               value={depth}
               onChange={(e) => setDepth(e.target.value)}
-              className="w-full px-4 py-2.5 bg-[#141618] border border-[#2b3036] rounded-md text-sm text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3 py-2 rounded-md bg-zinc-950 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"
             >
-              <option value="quick">Quick Discovery (3-5 primary sources)</option>
-              <option value="standard">Standard Rigor (8-12 sources, deep verification)</option>
-              <option value="deep">Exhaustive Multi-Hop (Complete EAL graph with deliverable suite)</option>
+              <option value="standard">Standard (8 Sources)</option>
+              <option value="quick">Quick Exploration (4 Sources)</option>
+              <option value="comprehensive">Comprehensive (16 Sources)</option>
             </select>
           </div>
         </div>
 
-        {/* Safety & Approval Checkbox */}
-        <div className="p-4 rounded-lg bg-[#141618] border border-[#2b3036] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <div>
-              <div className="text-xs font-semibold text-white">Auto-approve Low-Risk Operations</div>
-              <div className="text-[11px] text-gray-400">
-                High-risk actions (code execution, external mutations) will still require explicit human approval.
-              </div>
-            </div>
-          </div>
-          <input
-            type="checkbox"
-            checked={autoApproveLowRisk}
-            onChange={(e) => setAutoApproveLowRisk(e.target.checked)}
-            className="w-4 h-4 accent-cyan-400 rounded cursor-pointer"
-          />
-        </div>
+        <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-3 py-1.5 rounded-md text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors"
+          >
+            Cancel
+          </button>
 
-        {/* Submit Button */}
-        <div className="flex justify-end pt-4">
           <button
             type="submit"
             disabled={isSubmitting || !title.trim()}
-            className="px-6 py-2.5 bg-gradient-to-r from-cyan-400 to-emerald-400 text-black font-semibold text-xs rounded-md disabled:opacity-50 hover:opacity-95 transition-all flex items-center gap-2 shadow-lg shadow-cyan-500/10"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-md text-xs font-medium bg-zinc-100 text-zinc-950 hover:bg-white disabled:opacity-50 transition-colors shadow-sm"
           >
-            {isSubmitting ? "Orchestrating Fleet..." : "Launch Multi-Agent Workflow"}
-            <ArrowRight className="w-4 h-4" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Launching...</span>
+              </>
+            ) : (
+              <>
+                <span>Create & Begin Research</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
           </button>
         </div>
       </form>
     </div>
   );
 }
-

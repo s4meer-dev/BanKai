@@ -116,12 +116,14 @@ export interface MemoryItem {
 }
 
 export interface WorkflowEvent {
-  event_id: string;
+  event_id?: string;
   event_type: string;
   project_id: string;
-  workflow_id: string;
+  workflow_id?: string;
   task_id?: string;
   agent_id?: string;
+  agent_name?: string;
+  message?: string;
   timestamp: string;
-  payload: Record<string, any>;
+  payload?: Record<string, any>;
 }

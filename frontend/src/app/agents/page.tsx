@@ -10,10 +10,6 @@ import {
   ShieldCheck,
   Compass,
   Play,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  Layers,
 } from "lucide-react";
 
 interface AgentProfile {
@@ -23,7 +19,6 @@ interface AgentProfile {
   category: string;
   icon: any;
   model: string;
-  status: "idle" | "running" | "completed";
   latency: string;
   tokens: string;
   description: string;
@@ -34,11 +29,10 @@ const agentsList: AgentProfile[] = [
   {
     id: "orchestrator",
     name: "Orchestrator Agent",
-    role: "Autonomous Task Decomposition & Workflow Routing",
+    role: "Task Decomposition & Graph Routing",
     category: "Core Control",
     icon: Cpu,
-    model: "GPT-4o / Claude 3.5 Sonnet",
-    status: "completed",
+    model: "LangGraph StateGraph",
     latency: "450ms",
     tokens: "1,240",
     description: "Evaluates objective scope, breaks problems into dependency-aware subtasks, and prevents cyclic execution loops.",
@@ -47,191 +41,171 @@ const agentsList: AgentProfile[] = [
   {
     id: "research",
     name: "Research Agent",
-    role: "Web Intelligence & Source Extraction",
+    role: "Web Crawling & Source Extraction",
     category: "Information Gathering",
     icon: Search,
-    model: "DuckDuckGo + Crawl4AI",
-    status: "completed",
-    latency: "1,850ms",
-    tokens: "3,890",
-    description: "Dispatches multi-hop search queries, bypasses DOM noise, extracts sanitized Markdown, and computes SHA-256 hashes.",
-    capabilities: ["Multi-Engine Search", "DOM Sanitation", "Citation Extraction", "Content Provenance Hashing"],
+    model: "Multi-Provider (DDGS / SearXNG)",
+    latency: "1,200ms",
+    tokens: "3,850",
+    description: "Executes deep internet searches, sanitizes HTML into clean markdown, and computes SHA-256 provenance hashes.",
+    capabilities: ["Pluggable Web Search", "BeautifulSoup Parser", "SHA-256 Provenance", "Adversarial Injection Filtering"],
   },
   {
     id: "market_intel",
     name: "Market Intelligence Agent",
-    role: "Competitive Positioning & SWOT Synthesis",
-    category: "Strategic Analysis",
+    role: "Competitor & Market Landscape",
+    category: "Domain Intelligence",
     icon: TrendingUp,
-    model: "GPT-4o / Gemini 1.5 Pro",
-    status: "completed",
-    latency: "920ms",
-    tokens: "2,150",
-    description: "Evaluates competitor landscape, computes CAGR projections, formulates empirical SWOT matrices, and prices products.",
-    capabilities: ["Competitor Analysis", "SWOT Modeling", "Market Sizing", "Moat Evaluation"],
+    model: "Analytical Model",
+    latency: "680ms",
+    tokens: "2,100",
+    description: "Analyzes TAM/SAM/SOM market size, competitor feature matrices, and pricing economics.",
+    capabilities: ["SWOT Synthesis", "Competitive Matrix", "TAM/SAM/SOM Sizing", "Market Dynamics"],
   },
   {
-    id: "technical_research",
+    id: "tech_research",
     name: "Technical Research Agent",
-    role: "System Architecture & Feasibility Auditing",
-    category: "Engineering Analysis",
+    role: "Architecture Feasibility & Benchmarking",
+    category: "Domain Intelligence",
     icon: Code2,
-    model: "GPT-4o",
-    status: "completed",
-    latency: "1,120ms",
-    tokens: "2,480",
-    description: "Audits open-source frameworks, verifies API compatibility, reviews benchmarks, and architects fault-tolerant pipelines.",
-    capabilities: ["Stack Comparison", "Architecture Design", "API Discovery", "Security Feasibility"],
+    model: "Engineering Evaluator",
+    latency: "740ms",
+    tokens: "2,400",
+    description: "Performs technical trade-off matrices, benchmark comparisons, and dependency risk audits.",
+    capabilities: ["Stack Comparison", "Architecture Evaluation", "Latency Profiling", "Security Auditing"],
   },
   {
     id: "data_analyst",
     name: "Data Analyst Agent",
-    role: "Statistical Modeling & Financial Projections",
-    category: "Quantitative",
+    role: "Financial Projections & Modeling",
+    category: "Domain Intelligence",
     icon: LineChart,
-    model: "Python / Pandas / NumPy",
-    status: "completed",
-    latency: "680ms",
-    tokens: "1,840",
-    description: "Calculates unit economics, generates multi-year revenue models, and computes probability distributions in isolated Python.",
-    capabilities: ["Pandas Dataframes", "Financial Modeling", "Statistical Variance", "Chart Code Gen"],
+    model: "Quantitative Engine",
+    latency: "520ms",
+    tokens: "1,800",
+    description: "Computes 5-year financial models, operational cost ratios, unit economics, and summary metrics.",
+    capabilities: ["Financial Projection", "Unit Economics", "Margin Calculation", "Data Normalization"],
   },
   {
     id: "verification",
     name: "Verification Agent",
-    role: "Adversarial Fact-Checking & RQS Scoring",
-    category: "Integrity & Truth",
+    role: "Cross-Source Corroboration & RQS",
+    category: "Quality Governance",
     icon: ShieldCheck,
-    model: "Adversarial Validator",
-    status: "completed",
-    latency: "1,340ms",
+    model: "Adversarial Verifier",
+    latency: "890ms",
     tokens: "3,100",
-    description: "Detects unsupported statements, flags contradictions, and calculates the mathematical Research Quality Score (RQS).",
-    capabilities: ["Contradiction Detection", "Source Reliability Audit", "RQS Calculation", "Anti-Hallucination Gating"],
+    description: "Adversarial fact-checker detecting contradictions, evaluating primary evidence, and scoring Research Quality (RQS).",
+    capabilities: ["Contradiction Detection", "Corroboration Scoring", "Provenance Verification", "RQS Calculation"],
   },
   {
     id: "strategy",
     name: "Strategy Agent",
-    role: "Action Planning & Risk Matrix Gating",
-    category: "Executive Planning",
+    role: "Actionable Directives & Risk Tiering",
+    category: "Decision Synthesis",
     icon: Compass,
-    model: "GPT-4o",
-    status: "completed",
-    latency: "890ms",
-    tokens: "2,200",
-    description: "Translates verified findings into prioritized recommendations, generates execution plans, and flags HIGH-risk tasks.",
-    capabilities: ["Roadmap Generation", "Risk Tiering (LOW/MED/HIGH)", "Resource Estimation", "Human Approval Routing"],
+    model: "Strategic Framework",
+    latency: "610ms",
+    tokens: "2,050",
+    description: "Transforms verified evidence into prioritized strategic initiatives with explicit risk ratings.",
+    capabilities: ["Risk Classification", "Action Roadmapping", "Human Approval Gate", "Execution Plan Generation"],
   },
   {
     id: "execution",
     name: "Execution Agent",
-    role: "Verified Deliverable & Artifact Production",
-    category: "Execution & Artifacts",
+    role: "AST Sandbox & Deliverable Generation",
+    category: "Production Execution",
     icon: Play,
-    model: "OpenPyXL / Docx / PPTX / ReportLab",
-    status: "completed",
-    latency: "2,150ms",
-    tokens: "1,950",
-    description: "Compiles formatted Excel spreadsheets, Word dossiers, PowerPoint briefings, and publication PDFs with verified data.",
-    capabilities: ["Excel Workbook Gen", "Word Document Gen", "PowerPoint Slide Gen", "PDF Publication Gen"],
+    model: "Sandbox Compiler",
+    latency: "1,450ms",
+    tokens: "4,200",
+    description: "Executes AST-validated Python code and compiles professional deliverables (Excel, Word, PPTX, PDF, HTML charts).",
+    capabilities: ["Excel Financial Models", "Word Research Dossiers", "Executive Slide Decks", "Interactive Plotly HTML"],
   },
 ];
 
 export default function AgentsPage() {
-  const [selectedAgent, setSelectedAgent] = useState<AgentProfile>(agentsList[0]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+
+  const categories = ["ALL", "Core Control", "Information Gathering", "Domain Intelligence", "Quality Governance", "Decision Synthesis", "Production Execution"];
+
+  const filteredAgents = agentsList.filter((a) => {
+    if (selectedCategory === "ALL") return true;
+    return a.category === selectedCategory;
+  });
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2b3036] pb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Agent Command Center</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Real-time status, execution metrics, telemetry, and capabilities of all 8 specialized BAN KAI agents.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#141618] border border-[#2b3036] text-xs font-mono text-emerald-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>8 / 8 Agents Operational</span>
-        </div>
+    <div className="p-8 max-w-6xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="pb-6 border-b border-zinc-800/80">
+        <h1 className="text-xl font-semibold text-zinc-100 tracking-tight">Specialized Agent Fleet</h1>
+        <p className="text-xs text-zinc-400 mt-1">
+          8 autonomous agents operating collaboratively under LangGraph stateful orchestration.
+        </p>
       </div>
 
-      {/* Grid of All 8 Specialized Agents */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {agentsList.map((agent) => {
-          const Icon = agent.icon;
-          const isSelected = selectedAgent.id === agent.id;
+      {/* Filter Tabs */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {categories.map((c) => (
+          <button
+            key={c}
+            onClick={() => setSelectedCategory(c)}
+            className={`px-3 py-1 rounded text-xs transition-colors ${
+              selectedCategory === c
+                ? "bg-zinc-800 text-zinc-100 font-medium"
+                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/60"
+            }`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
+      {/* Agents Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredAgents.map((a) => {
+          const Icon = a.icon;
           return (
             <div
-              key={agent.id}
-              onClick={() => setSelectedAgent(agent)}
-              className={`p-5 rounded-lg border cursor-pointer transition-all ${
-                isSelected
-                  ? "bg-[#1a1d20] border-cyan-400 shadow-md shadow-cyan-500/10"
-                  : "bg-[#141618] border-[#2b3036] hover:border-gray-500 hover:bg-[#181a1d]"
-              }`}
+              key={a.id}
+              className="p-5 rounded-lg bg-zinc-950 border border-zinc-800/80 space-y-3 hover:border-zinc-700 transition-colors"
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-md ${isSelected ? "bg-cyan-500/20 text-cyan-400" : "bg-[#202428] text-gray-400"}`}>
-                  <Icon className="w-4 h-4" />
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium text-zinc-100">{a.name}</h3>
+                    <p className="text-[11px] text-zinc-500">{a.role}</p>
+                  </div>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-emerald-950 text-emerald-400 border border-emerald-800">
-                  {agent.status}
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">
+                  {a.category}
                 </span>
               </div>
 
-              <h2 className="font-semibold text-sm text-white">{agent.name}</h2>
-              <p className="text-xs text-gray-400 line-clamp-1 mt-1">{agent.role}</p>
+              <p className="text-xs text-zinc-400 leading-relaxed">{a.description}</p>
 
-              <div className="mt-4 pt-3 border-t border-[#2b3036]/60 flex items-center justify-between text-[11px] font-mono text-gray-400">
-                <span>Latency: {agent.latency}</span>
-                <span>{agent.tokens} tokens</span>
+              <div className="flex flex-wrap gap-1.5 pt-2">
+                {a.capabilities.map((cap, i) => (
+                  <span
+                    key={i}
+                    className="text-[10px] px-2 py-0.5 rounded bg-zinc-900/80 border border-zinc-800 text-zinc-400"
+                  >
+                    {cap}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-zinc-800/60 text-[10px] font-mono text-zinc-500">
+                <span>Model: {a.model}</span>
+                <span>Avg Latency: {a.latency}</span>
               </div>
             </div>
           );
         })}
       </div>
-
-      {/* Selected Agent Deep Dive Detail Panel */}
-      <div className="rounded-lg bg-[#141618] border border-[#2b3036] p-6 space-y-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3">
-              <span className="text-lg font-bold text-white">{selectedAgent.name}</span>
-              <span className="px-2.5 py-0.5 rounded text-xs font-mono text-cyan-400 bg-cyan-950 border border-cyan-800">
-                {selectedAgent.category}
-              </span>
-            </div>
-            <p className="text-xs text-gray-400">{selectedAgent.role}</p>
-          </div>
-
-          <div className="text-right text-xs font-mono text-gray-400 space-y-1">
-            <div>Model Engine: <span className="text-gray-200">{selectedAgent.model}</span></div>
-            <div>Avg Latency: <span className="text-emerald-400">{selectedAgent.latency}</span></div>
-          </div>
-        </div>
-
-        <p className="text-xs text-gray-300 leading-relaxed bg-[#1a1d20] p-4 rounded-md border border-[#2b3036]">
-          {selectedAgent.description}
-        </p>
-
-        {/* Capabilities Chips */}
-        <div className="space-y-2">
-          <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">Authorized Tool Capabilities</span>
-          <div className="flex flex-wrap gap-2">
-            {selectedAgent.capabilities.map((cap) => (
-              <span
-                key={cap}
-                className="px-3 py-1 rounded-md bg-[#202428] border border-[#2b3036] text-xs font-mono text-gray-200 flex items-center gap-1.5"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
-                {cap}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
-

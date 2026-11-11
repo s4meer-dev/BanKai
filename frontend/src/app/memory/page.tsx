@@ -1,40 +1,61 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Database,
   Search,
   Plus,
   Trash2,
-  Sparkles,
-  Layers,
   Clock,
-  ShieldCheck,
-  CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useBanKaiStore } from "@/lib/store";
-import { MemoryItem } from "@/types";
+import { MemoryItem, Project } from "@/types";
 
-export default function MemoryCenterPage() {
+function MemoryCenterContent() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const paramProjectId = searchParams.get("projectId");
+
   const activeProject = useBanKaiStore((state) => state.activeProject);
+  const setActiveProject = useBanKaiStore((state) => state.setActiveProject);
 
   const [activeTier, setActiveTier] = useState<string>("ALL");
   const [semanticQuery, setSemanticQuery] = useState("");
   const [searchResults, setSearchResults] = useState<MemoryItem[] | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
-  // New Memory Modal State
+  // New Memory Form State
   const [newKey, setNewKey] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newTier, setNewTier] = useState("knowledge");
   const [isAdding, setIsAdding] = useState(false);
 
+  // Fetch projects list
+  const { data: projects = [] } = useQuery<Project[]>({
+    queryKey: ["projects"],
+    queryFn: () => api.getProjects(),
+  });
+
+  useEffect(() => {
+    if (paramProjectId && projects.length > 0) {
+      const match = projects.find((p) => p.id === paramProjectId);
+      if (match && match.id !== activeProject?.id) {
+        setActiveProject(match);
+      }
+    } else if (!activeProject && projects.length > 0) {
+      setActiveProject(projects[0]);
+    }
+  }, [paramProjectId, projects, activeProject, setActiveProject]);
+
+  const currentProjId = activeProject?.id;
+
   const { data: memories = [], isLoading: memoriesLoading } = useQuery<MemoryItem[]>({
-    queryKey: ["memories", activeProject?.id],
-    queryFn: () => api.getMemories(activeProject?.id),
+    queryKey: ["memories", currentProjId],
+    queryFn: () => api.getMemories(currentProjId),
   });
 
   const handleSemanticSearch = async (e: React.FormEvent) => {
@@ -45,7 +66,7 @@ export default function MemoryCenterPage() {
     }
     setIsSearching(true);
     try {
-      const res = await api.queryMemory(semanticQuery, activeProject?.id);
+      const res = await api.queryMemory(semanticQuery, currentProjId);
       setSearchResults(res);
     } catch (err: any) {
       alert(`Search error: ${err.message}`);
@@ -62,204 +83,163 @@ export default function MemoryCenterPage() {
         key: newKey,
         content: newContent,
         tier: newTier,
-        project_id: activeProject?.id,
-        relevance_score: 1.0,
+        project_id: currentProjId,
+        metadata_json: { created_via: "web_ui" },
       });
       setNewKey("");
       setNewContent("");
       setIsAdding(false);
-      queryClient.invalidateQueries({ queryKey: ["memories"] });
+      queryClient.invalidateQueries({ queryKey: ["memories", currentProjId] });
     } catch (err: any) {
       alert(`Error storing memory: ${err.message}`);
     }
   };
 
-  const handleDeleteMemory = async (id: string) => {
-    try {
-      await api.deleteMemory(id);
-      queryClient.invalidateQueries({ queryKey: ["memories"] });
-    } catch (err: any) {
-      alert(`Error deleting memory: ${err.message}`);
-    }
-  };
-
-  const displayedMemories = searchResults !== null ? searchResults : memories.filter((m) => {
+  const displayMemories = searchResults || memories;
+  const filteredMemories = displayMemories.filter((m) => {
     if (activeTier === "ALL") return true;
-    return m.tier === activeTier;
+    return m.tier.toLowerCase() === activeTier.toLowerCase();
   });
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-8 max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2b3036] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Persistent Memory Center</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            4-tier persistent knowledge base with pgvector semantic similarity search and relevance thresholding.
+          <h1 className="text-xl font-semibold text-zinc-100 tracking-tight">Memory Engine</h1>
+          <p className="text-xs text-zinc-400 mt-1">
+            4-tier persistent semantic memory (Session, Project, User, Knowledge) with pgvector retrieval.
           </p>
         </div>
+
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="px-4 py-2 bg-gradient-to-r from-cyan-400 to-emerald-400 text-black font-semibold text-xs rounded-md shadow-md shadow-cyan-500/10 flex items-center gap-1.5"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-zinc-100 text-zinc-950 hover:bg-white transition-colors self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Explicit Memory</span>
+          <Plus className="w-3.5 h-3.5" />
+          <span>{isAdding ? "Cancel" : "Store Memory"}</span>
         </button>
       </div>
 
-      {/* Semantic Search Bar */}
-      <div className="rounded-xl bg-[#141618] border border-[#2b3036] p-4">
-        <form onSubmit={handleSemanticSearch} className="flex items-center gap-3">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              value={semanticQuery}
-              onChange={(e) => setSemanticQuery(e.target.value)}
-              placeholder="Search persistent knowledge semantically using pgvector cosine similarity..."
-              className="w-full pl-10 pr-4 py-2 bg-[#0c0d0e] border border-[#2b3036] rounded-md text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={isSearching}
-            className="px-4 py-2 bg-[#202428] border border-[#2b3036] hover:border-cyan-500/50 text-xs font-semibold text-white rounded-md flex items-center gap-1.5"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{isSearching ? "Searching..." : "Vector Search"}</span>
-          </button>
-          {searchResults !== null && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearchResults(null);
-                setSemanticQuery("");
-              }}
-              className="px-3 py-2 text-xs text-gray-400 hover:text-white"
-            >
-              Reset
-            </button>
-          )}
-        </form>
-      </div>
-
-      {/* Add Memory Form Accordion */}
+      {/* New Memory Drawer */}
       {isAdding && (
-        <form onSubmit={handleCreateMemory} className="p-5 rounded-lg bg-[#141618] border border-[#2b3036] space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-white font-mono">Store Explicit Memory Item</span>
-            <span className="text-[10px] text-gray-500 font-mono">Automatic deduplication applied</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleCreateMemory} className="p-4 rounded-lg bg-zinc-900/40 border border-zinc-800/80 space-y-3">
+          <div className="text-xs font-medium text-zinc-200">Store Persistent Fact or Insight</div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input
               type="text"
-              required
+              placeholder="Memory Key (e.g. rust_wasm_edge_latency)"
               value={newKey}
               onChange={(e) => setNewKey(e.target.value)}
-              placeholder="Memory Key / Identifier (e.g. strategic_constraint_2026)"
-              className="px-3 py-2 bg-[#0c0d0e] border border-[#2b3036] rounded-md text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="px-3 py-1.5 rounded bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
             />
             <select
               value={newTier}
               onChange={(e) => setNewTier(e.target.value)}
-              className="px-3 py-2 bg-[#0c0d0e] border border-[#2b3036] rounded-md text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="px-3 py-1.5 rounded bg-zinc-950 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"
             >
-              <option value="knowledge">Knowledge Tier (Global Semantic Search)</option>
-              <option value="project">Project Tier (Workspace Bound)</option>
-              <option value="user">User Preferences Tier</option>
+              <option value="knowledge">Knowledge Tier</option>
+              <option value="project">Project Tier</option>
               <option value="session">Session Tier</option>
+              <option value="user">User Tier</option>
             </select>
-          </div>
-
-          <textarea
-            required
-            rows={3}
-            value={newContent}
-            onChange={(e) => setNewContent(e.target.value)}
-            placeholder="Verified memory facts, constraints, user preferences, or conclusions..."
-            className="w-full px-3 py-2 bg-[#0c0d0e] border border-[#2b3036] rounded-md text-xs text-white focus:outline-none focus:border-cyan-400"
-          />
-
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setIsAdding(false)}
-              className="px-3 py-1.5 text-xs text-gray-400 hover:text-white"
-            >
-              Cancel
-            </button>
             <button
               type="submit"
-              className="px-4 py-1.5 bg-cyan-400 text-black font-semibold text-xs rounded-md shadow-md"
+              className="px-3 py-1.5 rounded bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-medium transition-colors"
             >
-              Save Memory
+              Save Fact
             </button>
           </div>
+          <textarea
+            placeholder="Fact content or empirical finding to embed into semantic vector space..."
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+            rows={2}
+            className="w-full px-3 py-2 rounded bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
+          />
         </form>
       )}
 
-      {/* Tier Switcher Filters */}
-      <div className="flex items-center gap-2 border-b border-[#2b3036] pb-3">
-        {["ALL", "knowledge", "project", "user", "session"].map((tier) => (
+      {/* Semantic Search Bar */}
+      <form onSubmit={handleSemanticSearch} className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-zinc-500" />
+          <input
+            type="text"
+            placeholder="Semantic vector query across stored findings..."
+            value={semanticQuery}
+            onChange={(e) => setSemanticQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 rounded-md bg-zinc-950 border border-zinc-800 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-700"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isSearching}
+          className="px-4 py-2 rounded-md bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-medium disabled:opacity-50 transition-colors"
+        >
+          {isSearching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Search Vectors"}
+        </button>
+      </form>
+
+      {/* Tier Filter Tabs */}
+      <div className="flex items-center gap-1.5 pb-2 border-b border-zinc-800/80">
+        {["ALL", "KNOWLEDGE", "PROJECT", "SESSION", "USER"].map((t) => (
           <button
-            key={tier}
-            onClick={() => setActiveTier(tier)}
-            className={`px-3 py-1 rounded-md text-xs font-mono uppercase transition-colors ${
-              activeTier === tier
-                ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/50"
-                : "text-gray-400 hover:text-white"
+            key={t}
+            onClick={() => setActiveTier(t)}
+            className={`px-3 py-1 rounded text-xs transition-colors ${
+              activeTier === t
+                ? "bg-zinc-800 text-zinc-100 font-medium"
+                : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
-            {tier}
+            {t}
           </button>
         ))}
       </div>
 
-      {/* Memory Items Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Memory Cards */}
+      <div className="space-y-3">
         {memoriesLoading ? (
-          <div className="col-span-3 p-8 text-center text-xs text-gray-400">Loading persistent memory...</div>
-        ) : displayedMemories.length === 0 ? (
-          <div className="col-span-3 p-8 text-center text-xs text-gray-400">
-            No memories match the current filter.
+          <div className="p-8 text-center text-xs text-zinc-500 border border-zinc-800/60 rounded-lg">
+            Loading memory items...
+          </div>
+        ) : filteredMemories.length === 0 ? (
+          <div className="p-8 text-center text-xs text-zinc-500 border border-zinc-800/60 rounded-lg bg-zinc-950">
+            No memories stored in this tier yet.
           </div>
         ) : (
-          displayedMemories.map((mem) => (
-            <div
-              key={mem.id}
-              className="p-4 rounded-lg bg-[#141618] border border-[#2b3036] flex flex-col justify-between space-y-3 hover:border-gray-500 transition-colors"
-            >
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#202428] text-cyan-400 border border-[#2b3036]">
-                    {mem.tier}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {filteredMemories.map((m) => (
+              <div
+                key={m.id}
+                className="p-4 rounded-lg bg-zinc-950 border border-zinc-800/80 space-y-2 hover:border-zinc-700 transition-colors"
+              >
+                <div className="flex items-center justify-between text-[10px] font-mono">
+                  <span className="text-zinc-400 font-medium">{m.key}</span>
+                  <span className="text-zinc-500 uppercase px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800">
+                    {m.tier}
                   </span>
-                  {mem.similarity !== undefined && (
-                    <span className="text-[10px] font-mono text-emerald-400">
-                      Sim: {(mem.similarity * 100).toFixed(1)}%
-                    </span>
-                  )}
                 </div>
-                <div className="font-semibold text-xs text-white">{mem.key}</div>
-                <p className="text-xs text-gray-300 leading-relaxed font-sans">{mem.content}</p>
+                <p className="text-xs text-zinc-200 leading-relaxed">{m.content}</p>
+                {m.relevance_score !== undefined && (
+                  <div className="text-[10px] text-zinc-500 font-mono pt-1 border-t border-zinc-900">
+                    Relevance Score: {Math.round(m.relevance_score * 100)}%
+                  </div>
+                )}
               </div>
-
-              <div className="pt-2 border-t border-[#2b3036]/60 flex items-center justify-between text-[10px] text-gray-500 font-mono">
-                <span>Rel: {mem.relevance_score * 100}%</span>
-                <button
-                  onClick={() => handleDeleteMemory(mem.id)}
-                  className="text-gray-500 hover:text-red-400 transition-colors"
-                  title="Delete Memory"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </div>
     </div>
   );
 }
 
+export default function MemoryCenterPage() {
+  return (
+    <Suspense fallback={<div className="p-8 max-w-7xl mx-auto text-zinc-500 font-mono text-xs">Loading memory ledger...</div>}>
+      <MemoryCenterContent />
+    </Suspense>
+  );
+}

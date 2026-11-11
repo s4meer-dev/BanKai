@@ -1,51 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Radio, Activity, Terminal } from "lucide-react";
+import { Plus, Terminal, ExternalLink } from "lucide-react";
 import { useBanKaiStore } from "@/lib/store";
 
 export function Header() {
   const activeAgent = useBanKaiStore((state) => state.activeAgent);
-  const isConnectedSSE = useBanKaiStore((state) => state.isConnectedSSE);
+  const activeProject = useBanKaiStore((state) => state.activeProject);
 
   return (
-    <header className="h-16 border-b border-[#2b3036] bg-[#141618] px-8 flex items-center justify-between select-none">
-      {/* Telemetry Indicator */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1a1d20] border border-[#2b3036] text-xs">
-          <Activity className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="text-gray-400">Agent Status:</span>
-          <span className="font-mono font-medium text-gray-200">
-            {activeAgent ? `${activeAgent} (Active)` : "Ready"}
+    <header className="h-14 border-b border-zinc-800/80 bg-zinc-950 px-6 flex items-center justify-between select-none">
+      {/* Left: Active Status Context */}
+      <div className="flex items-center gap-3 text-xs">
+        <div className="flex items-center gap-2 text-zinc-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span>Status:</span>
+          <span className="text-zinc-200 font-medium font-mono">
+            {activeAgent ? `${activeAgent} running` : "Idle"}
           </span>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1a1d20] border border-[#2b3036] text-xs">
-          <Radio className={`w-3.5 h-3.5 ${isConnectedSSE ? "text-emerald-400 animate-pulse" : "text-gray-500"}`} />
-          <span className="text-gray-400">Event Stream:</span>
-          <span className="font-mono text-gray-200">{isConnectedSSE ? "SSE Connected" : "Connecting"}</span>
-        </div>
+        {activeProject && (
+          <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-zinc-800 text-zinc-400">
+            <span>Project:</span>
+            <span className="text-zinc-300 font-medium truncate max-w-[200px]">
+              {activeProject.title}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex items-center gap-3">
+      {/* Right: Quick Actions */}
+      <div className="flex items-center gap-2.5">
         <Link
           href="/workflow"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium text-gray-300 bg-[#1a1d20] border border-[#2b3036] hover:bg-[#202428] hover:text-white transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 transition-colors"
         >
-          <Terminal className="w-3.5 h-3.5 text-gray-400" />
-          <span>Live Console</span>
+          <Terminal className="w-3.5 h-3.5" />
+          <span>Live Graph</span>
         </Link>
 
-        <Link
-          href="/projects/new"
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-semibold text-black bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 shadow-md shadow-cyan-500/10 transition-all"
+        <a
+          href="http://localhost:8000/docs"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors"
         >
-          <Plus className="w-4 h-4 text-black" />
-          <span>New Research Objective</span>
+          <span>API Docs</span>
+          <ExternalLink className="w-3 h-3 text-zinc-500" />
+        </a>
+
+        <Link
+          href="/workspace"
+          className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium text-zinc-950 bg-zinc-100 hover:bg-white transition-colors shadow-sm"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span>New Objective</span>
         </Link>
       </div>
     </header>
   );
 }
-

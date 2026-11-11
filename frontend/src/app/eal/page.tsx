@@ -1,187 +1,247 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   FileCheck2,
   ShieldCheck,
-  GitBranch,
   ArrowRight,
-  CheckCircle2,
-  AlertCircle,
+  ExternalLink,
   Layers,
-  Sparkles,
+  FileText,
+  FileSpreadsheet,
+  Presentation,
+  CheckCircle2,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useBanKaiStore } from "@/lib/store";
-import { EALGraphResponse, EALQualityScoreResponse, EALTraceNode } from "@/types";
+import { EALGraphResponse, EALQualityScoreResponse, EALTraceNode, Project } from "@/types";
 
-export default function EALPage() {
+function EALContent() {
+  const searchParams = useSearchParams();
+  const paramProjectId = searchParams.get("projectId");
+
   const activeProject = useBanKaiStore((state) => state.activeProject);
+  const setActiveProject = useBanKaiStore((state) => state.setActiveProject);
   const [selectedNode, setSelectedNode] = useState<EALTraceNode | null>(null);
 
+  // Fetch projects list for switcher
+  const { data: projects = [] } = useQuery<Project[]>({
+    queryKey: ["projects"],
+    queryFn: () => api.getProjects(),
+  });
+
+  useEffect(() => {
+    if (paramProjectId && projects.length > 0) {
+      const match = projects.find((p) => p.id === paramProjectId);
+      if (match && match.id !== activeProject?.id) {
+        setActiveProject(match);
+      }
+    } else if (!activeProject && projects.length > 0) {
+      setActiveProject(projects[0]);
+    }
+  }, [paramProjectId, projects, activeProject, setActiveProject]);
+
+  const currentProjId = activeProject?.id;
+
   const { data: graphData, isLoading: graphLoading } = useQuery<EALGraphResponse>({
-    queryKey: ["eal-graph", activeProject?.id],
-    queryFn: () => api.getEALGraph(activeProject!.id),
-    enabled: !!activeProject?.id,
+    queryKey: ["eal-graph", currentProjId],
+    queryFn: () => (currentProjId ? api.getEALGraph(currentProjId) : Promise.resolve(null)),
+    enabled: !!currentProjId,
   });
 
   const { data: qualityScore } = useQuery<EALQualityScoreResponse>({
-    queryKey: ["eal-score", activeProject?.id],
-    queryFn: () => api.getEALScore(activeProject!.id),
-    enabled: !!activeProject?.id,
+    queryKey: ["eal-score", currentProjId],
+    queryFn: () => (currentProjId ? api.getEALScore(currentProjId) : Promise.resolve(null)),
+    enabled: !!currentProjId,
   });
 
+  // Group nodes by type
+  const nodes = graphData?.nodes || [];
+  const objectiveNodes = nodes.filter((n) => n.type === "objective");
+  const sourceNodes = nodes.filter((n) => n.type === "source");
+  const claimNodes = nodes.filter((n) => n.type === "claim");
+  const recNodes = nodes.filter((n) => n.type === "recommendation");
+  const artifactNodes = nodes.filter((n) => n.type === "artifact");
+
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-8 max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2b3036] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-400 border border-cyan-800">
-              SIGNATURE CAPABILITY
-            </span>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Evidence-to-Action Ledger (EAL)</h1>
-          </div>
-          <p className="text-sm text-gray-400 mt-1">
-            Complete mathematical and relational lineage from User Objective &rarr; Claims &rarr; Verification &rarr; Strategy &rarr; Execution.
+          <h1 className="text-xl font-semibold text-zinc-100 tracking-tight">Evidence-to-Action Ledger</h1>
+          <p className="text-xs text-zinc-400 mt-1">
+            Complete relational lineage linking Objectives &rarr; Sources &rarr; Claims &rarr; Verification &rarr; Deliverables.
           </p>
         </div>
 
-        {qualityScore && (
-          <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#141618] border border-[#2b3036]">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <div>
-              <div className="text-[10px] text-gray-400 font-mono">RESEARCH QUALITY SCORE</div>
-              <div className="text-lg font-bold font-mono text-white">{qualityScore.overall_score}%</div>
-            </div>
+        {projects.length > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-zinc-500 font-mono">Workspace:</span>
+            <select
+              value={activeProject?.id || ""}
+              onChange={(e) => {
+                const found = projects.find((p) => p.id === e.target.value);
+                if (found) setActiveProject(found);
+              }}
+              className="px-2.5 py-1.5 rounded-md bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 focus:outline-none"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.title}
+                </option>
+              ))}
+            </select>
           </div>
         )}
       </div>
 
-      {/* Quality Score Radar Metrics */}
+      {/* RQS Score Banner */}
       {qualityScore && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="p-4 rounded-lg bg-[#141618] border border-[#2b3036] space-y-1">
-            <div className="text-xs text-gray-400 font-mono">CITATION COVERAGE</div>
-            <div className="text-xl font-bold text-white font-mono">
-              {(qualityScore.citation_coverage * 100).toFixed(0)}%
+        <div className="p-5 rounded-lg bg-zinc-900/30 border border-zinc-800/80 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">
+                Research Quality Score (RQS)
+              </div>
+              <div className="text-3xl font-semibold text-zinc-100 font-mono mt-0.5">
+                {qualityScore.overall_score}%
+              </div>
             </div>
-            <div className="text-[10px] text-gray-500">Claims with primary source URLs</div>
+            <div className="text-xs text-zinc-400 max-w-md">
+              Evaluated mathematically based on source authority, corroboration density, and contradiction resolution.
+            </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-[#141618] border border-[#2b3036] space-y-1">
-            <div className="text-xs text-gray-400 font-mono">SOURCE RELIABILITY</div>
-            <div className="text-xl font-bold text-white font-mono">
-              {(qualityScore.source_reliability_avg * 100).toFixed(0)}%
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-zinc-800/60">
+            <div className="space-y-0.5">
+              <div className="text-[10px] text-zinc-500 font-mono">CITATION COVERAGE</div>
+              <div className="text-base font-semibold text-zinc-200 font-mono">
+                {(qualityScore.citation_coverage * 100).toFixed(0)}%
+              </div>
+              <div className="text-[10px] text-zinc-500">Backed by URLs</div>
             </div>
-            <div className="text-[10px] text-gray-500">Mean publisher reputation index</div>
-          </div>
 
-          <div className="p-4 rounded-lg bg-[#141618] border border-[#2b3036] space-y-1">
-            <div className="text-xs text-gray-400 font-mono">VERIFICATION RATE</div>
-            <div className="text-xl font-bold text-white font-mono">
-              {(qualityScore.verification_rate * 100).toFixed(0)}%
+            <div className="space-y-0.5">
+              <div className="text-[10px] text-zinc-500 font-mono">SOURCE RELIABILITY</div>
+              <div className="text-base font-semibold text-zinc-200 font-mono">
+                {(qualityScore.source_reliability_avg * 100).toFixed(0)}%
+              </div>
+              <div className="text-[10px] text-zinc-500">Publisher rating</div>
             </div>
-            <div className="text-[10px] text-gray-500">Corroborated by independent evidence</div>
-          </div>
 
-          <div className="p-4 rounded-lg bg-[#141618] border border-[#2b3036] space-y-1">
-            <div className="text-xs text-gray-400 font-mono">CONTRADICTION RESOLUTION</div>
-            <div className="text-xl font-bold text-white font-mono">
-              {(qualityScore.contradiction_resolution_rate * 100).toFixed(0)}%
+            <div className="space-y-0.5">
+              <div className="text-[10px] text-zinc-500 font-mono">VERIFICATION RATE</div>
+              <div className="text-base font-semibold text-zinc-200 font-mono">
+                {(qualityScore.verification_rate * 100).toFixed(0)}%
+              </div>
+              <div className="text-[10px] text-zinc-500">Corroborated claims</div>
             </div>
-            <div className="text-[10px] text-gray-500">Absence of conflicting assertions</div>
+
+            <div className="space-y-0.5">
+              <div className="text-[10px] text-zinc-500 font-mono">CONFLICT RESILIENCE</div>
+              <div className="text-base font-semibold text-zinc-200 font-mono">
+                {(qualityScore.contradiction_resolution_rate * 100).toFixed(0)}%
+              </div>
+              <div className="text-[10px] text-zinc-500">Conflict-free</div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Lineage Node Explorer */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Graph Nodes List grouped by entity type */}
-        <div className="lg:col-span-2 rounded-lg bg-[#141618] border border-[#2b3036] overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-[#2b3036] flex items-center justify-between bg-[#101214]">
-            <div className="flex items-center gap-2">
-              <GitBranch className="w-4 h-4 text-cyan-400" />
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-white">Lineage Chain Nodes</h2>
-            </div>
-            <span className="text-[11px] font-mono text-gray-400">{graphData?.nodes.length || 0} Entities</span>
+      {/* Lineage Graph Overview */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium text-zinc-200">Relational Provenance Chain</h2>
+          <span className="text-xs text-zinc-500 font-mono">
+            {graphData?.nodes?.length || 0} Entities • {graphData?.edges?.length || 0} Traceable Links
+          </span>
+        </div>
+
+        {graphLoading ? (
+          <div className="p-12 text-center text-xs text-zinc-500 border border-zinc-800/60 rounded-lg">
+            Loading lineage graph...
           </div>
-
-          <div className="divide-y divide-[#2b3036] overflow-y-auto max-h-[600px]">
-            {graphLoading ? (
-              <div className="p-8 text-center text-xs text-gray-400">Traversing ledger lineage...</div>
-            ) : !graphData || graphData.nodes.length === 0 ? (
-              <div className="p-8 text-center text-xs text-gray-400">
-                No ledger records registered for this workspace yet. Execute a workflow to populate the EAL graph.
+        ) : nodes.length === 0 ? (
+          <div className="p-12 text-center text-xs text-zinc-500 border border-zinc-800/60 rounded-lg bg-zinc-950">
+            No ledger records for this workspace. Run a research objective from the Workspace tab first.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Step 1: Objective */}
+            <div className="p-4 rounded-lg bg-zinc-950 border border-zinc-800/80 space-y-1.5">
+              <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+                1. ROOT USER OBJECTIVE
               </div>
-            ) : (
-              graphData.nodes.map((node) => (
-                <div
-                  key={node.id}
-                  onClick={() => setSelectedNode(node)}
-                  className={`p-4 flex items-center justify-between cursor-pointer hover:bg-[#1a1d20] transition-colors ${
-                    selectedNode?.id === node.id ? "bg-[#1a1d20] border-l-2 border-cyan-400" : ""
-                  }`}
-                >
-                  <div className="space-y-1 max-w-[80%]">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#202428] text-gray-300 border border-[#2b3036]">
-                        {node.type}
-                      </span>
-                      <span className="font-semibold text-xs text-white truncate">{node.title}</span>
-                    </div>
-                    {node.subtitle && <p className="text-[11px] text-gray-400 truncate">{node.subtitle}</p>}
-                  </div>
+              <div className="text-sm font-medium text-zinc-100">
+                {objectiveNodes[0]?.title || activeProject?.title}
+              </div>
+              {objectiveNodes[0]?.data?.description && (
+                <p className="text-xs text-zinc-400">{objectiveNodes[0].data.description}</p>
+              )}
+            </div>
 
-                  <ArrowRight className="w-4 h-4 text-gray-500" />
+            {/* Step 2: Sources */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-zinc-400 flex items-center gap-1.5">
+                <span>2. PROVENANCED WEB SOURCES ({sourceNodes.length})</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                {sourceNodes.slice(0, 8).map((s) => (
+                  <div key={s.id} className="p-3 rounded-md bg-zinc-950 border border-zinc-800/70 space-y-1">
+                    <div className="text-xs font-medium text-zinc-200 truncate">{s.title}</div>
+                    <div className="text-[10px] text-zinc-500 font-mono truncate">{s.subtitle}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Step 3: Verified Claims */}
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-zinc-400 flex items-center gap-1.5">
+                <span>3. CORROBORATED EMPIRICAL CLAIMS ({claimNodes.length})</span>
+              </div>
+              <div className="divide-y divide-zinc-800/60 border border-zinc-800/80 rounded-md overflow-hidden bg-zinc-950">
+                {claimNodes.slice(0, 10).map((c, i) => (
+                  <div key={c.id} className="p-3 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-mono">
+                      <span className="text-zinc-500">CLAIM #{i + 1}</span>
+                      <span className="text-emerald-400 font-medium">VERIFIED</span>
+                    </div>
+                    <p className="text-xs text-zinc-200">{c.title}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Step 4: Deliverables Produced */}
+            {artifactNodes.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-xs font-medium text-zinc-400 flex items-center gap-1.5">
+                  <span>4. GENERATED DELIVERABLES ({artifactNodes.length})</span>
                 </div>
-              ))
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                  {artifactNodes.map((a) => (
+                    <div key={a.id} className="p-3 rounded-md bg-zinc-950 border border-zinc-800/70 space-y-1">
+                      <div className="text-xs font-medium text-zinc-200 truncate">{a.title}</div>
+                      <div className="text-[10px] text-zinc-500 font-mono">{a.subtitle}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
-        </div>
-
-        {/* Node Inspection Inspector Drawer */}
-        <div className="rounded-lg bg-[#141618] border border-[#2b3036] p-5 space-y-4">
-          <div className="text-xs font-semibold uppercase tracking-wider text-white flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span>Entity Inspector</span>
-          </div>
-
-          {selectedNode ? (
-            <div className="space-y-4 text-xs">
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono text-gray-400 uppercase">Entity Title</span>
-                <div className="font-semibold text-white">{selectedNode.title}</div>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono text-gray-400 uppercase">Type & Subtitle</span>
-                <div className="text-gray-300">{selectedNode.subtitle || selectedNode.type}</div>
-              </div>
-
-              {selectedNode.status && (
-                <div className="space-y-1">
-                  <span className="text-[10px] font-mono text-gray-400 uppercase">Verified State</span>
-                  <div className="font-mono text-emerald-400 font-bold">{selectedNode.status}</div>
-                </div>
-              )}
-
-              <div className="space-y-1">
-                <span className="text-[10px] font-mono text-gray-400 uppercase">Audit Metadata</span>
-                <pre className="p-3 rounded bg-[#0c0d0e] border border-[#2b3036] font-mono text-[11px] text-gray-300 overflow-x-auto max-h-60">
-                  {JSON.stringify(selectedNode.data, null, 2)}
-                </pre>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center text-xs text-gray-400 py-12">
-              Select any node from the lineage chain on the left to inspect its cryptographic provenance and evidence link.
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
 }
 
+export default function EALPage() {
+  return (
+    <Suspense fallback={<div className="p-8 max-w-7xl mx-auto text-zinc-500 font-mono text-xs">Loading Evidence-to-Action Ledger...</div>}>
+      <EALContent />
+    </Suspense>
+  );
+}

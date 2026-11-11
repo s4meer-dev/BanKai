@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.artifact import Artifact
 from app.models.project import Project
@@ -23,12 +24,15 @@ async def list_projects(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Lists all projects owned by the user."""
-    result = await db.execute(
-        select(Project)
-        .where(Project.user_id == current_user.id)
-        .order_by(Project.created_at.desc())
-    )
+    """Lists all projects owned by the user (or all projects in development/admin mode)."""
+    if current_user.role == "admin" or settings.APP_ENV == "development":
+        result = await db.execute(select(Project).order_by(Project.created_at.desc()))
+    else:
+        result = await db.execute(
+            select(Project)
+            .where(Project.user_id == current_user.id)
+            .order_by(Project.created_at.desc())
+        )
     return result.scalars().all()
 
 
@@ -59,9 +63,10 @@ async def get_project(
     current_user: User = Depends(get_current_user),
 ):
     """Retrieves detailed project statistics."""
-    result = await db.execute(
-        select(Project).where(Project.id == project_id, Project.user_id == current_user.id)
-    )
+    query = select(Project).where(Project.id == project_id)
+    if current_user.role != "admin" and settings.APP_ENV != "development":
+        query = query.where(Project.user_id == current_user.id)
+    result = await db.execute(query)
     project = result.scalar_one_or_none()
     if not project:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found.")
