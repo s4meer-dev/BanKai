@@ -1,69 +1,76 @@
-# BAN KAI
+# Skills & Agents Foundation
 
-> **Autonomous Multi-Agent AI Research & Execution Platform**  
-> Engineered with the unified skill suites of [Addy Osmani](https://github.com/addyosmani/agent-skills) and [Matt Pocock](https://github.com/mattpocock/skills).
+A modern, production-grade development foundation configured with the complete professional engineering skill suites and agent personas from:
+- **Addy Osmani** ([`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills))
+- **Matt Pocock** ([`mattpocock/skills`](https://github.com/mattpocock/skills))
 
----
-
-## Overview
-
-BAN KAI is an autonomous multi-agent platform designed to convert complex objectives into verified evidence, strategic execution plans, and persistent knowledge deliverables.
-
-The repository is pre-configured with **64 professional engineering skills** and agent personas covering the entire software lifecycle:
-- **Specification & Planning:** Spec-driven development, interactive grilling, task breakdown.
-- **Architecture & Domain Modeling:** Deep modules, high cohesion, algebraic state modeling.
-- **Frontend & UI Engineering:** Minimalist, aesthetic, human-crafted design language (Linear/Raycast aesthetic in monochrome zinc).
-- **Test-Driven Development:** Red-Green-Refactor, edge-case hardening, 100% verification.
-- **Root-Cause Debugging:** Scientific hypothesis testing, zero guesswork.
-- **Security & Hardening:** AST sandboxing, prompt injection defense, boundary validation.
-- **Performance & Latency:** Profiling, Core Web Vitals, asynchronous throughput.
+This repository provides an autonomous, real-engineering environment that turns any coding agent (Antigravity, Claude Code, Cursor, Copilot, Codex) into a disciplined senior engineering team.
 
 ---
 
-## Skills Architecture
+## What is Included
 
-The repository embeds skills into `.agents/skills/` for universal compatibility across coding agents (Antigravity, Claude Code, Cursor, Codex, Copilot):
+### 1. 64 Engineering Skills (`.agents/skills/`)
 
-### Addy Osmani Engineering Skills (`addyosmani/agent-skills`)
-- `api-and-interface-design`
-- `browser-testing-with-devtools`
-- `ci-cd-and-automation`
-- `code-review-and-quality`
-- `code-simplification`
-- `constraint-driven-development`
-- `context-engineering`
-- `debugging-and-error-recovery`
-- `deprecation-and-migration`
-- `documentation-and-adrs`
-- `doubt-driven-development`
-- `frontend-ui-engineering`
-- `git-workflow-and-versioning`
-- `idea-refine`
-- `incremental-implementation`
-- `interview-me`
-- `observability-and-instrumentation`
-- `performance-optimization`
-- `planning-and-task-breakdown`
-- `security-and-hardening`
-- `shipping-and-launch`
-- `source-driven-development`
-- `spec-driven-development`
-- `test-driven-development`
-- `using-agent-skills`
+#### **Software Architecture & Domain Modeling**
+- `codebase-design`: Deep module boundaries, high cohesion, low coupling, avoiding shallow wrappers.
+- `domain-modeling`: Expressive types, state machines, algebraic domain definitions.
+- `api-and-interface-design`: Clean, ergonomic, type-safe API boundaries.
+- `improve-codebase-architecture`: Refactoring spaghetti into modular systems.
 
-### Matt Pocock Real Engineering Skills (`mattpocock/skills`)
-- **Core Engineering:** `codebase-design`, `domain-modeling`, `diagnosing-bugs`, `improve-codebase-architecture`, `tdd`, `to-spec`, `implement-spec`, `to-tickets`, `ask-matt`, `code-review`, `pr`, `prototype`, `research`, `retro`, `triage`, `wayfinder`, `wizard`
-- **Productivity & Discovery:** `grill-me`, `grilling`, `grill-with-docs`, `handoff`, `teach`, `to-questionnaire`, `wait-what`, `writing-for-agents`
-- **Emerging & Advanced:** `chief-of-staff`, `claude-handoff`, `loop-me`, `setup-ts-deep-modules`, `software-factory`, `writing-beats`, `writing-fragments`, `writing-shape`, `git-guardrails-claude-code`, `setup-pre-commit`
+#### **Specification & Planning**
+- `spec-driven-development` & `to-spec`: Clear requirements and acceptance criteria before writing code.
+- `grill-me`, `grilling`, `grill-with-docs`: Interactive architectural stress-testing to eliminate ambiguity.
+- `planning-and-task-breakdown` & `to-tickets`: Phased execution roadmaps with verification gates.
+- `idea-refine` & `interview-me`: Divergent and convergent ideation to sharpen fuzzy requirements.
 
-### Agent Personas (`.agents/agents/`)
-- `code-reviewer.md` — Staff-level 5-dimensional review (Correctness, Readability, Architecture, Security, Performance).
-- `security-auditor.md` — AST security, injection prevention, and privilege boundaries.
-- `test-engineer.md` — Test matrix design, edge case generation, and regression suites.
-- `web-performance-auditor.md` — Core Web Vitals, network payloads, and rendering latency.
+#### **Implementation & Quality**
+- `incremental-implementation` & `implement-spec`: Thin, verifiable slices with continuous compilation.
+- `tdd` & `test-driven-development`: Red-Green-Refactor loop, edge-case coverage, zero mock pollution.
+- `code-simplification`: Ruthless elimination of dead code, over-engineering, and premature abstractions.
+- `diagnosing-bugs` & `debugging-and-error-recovery`: Scientific hypothesis testing; no blind guesswork.
+
+#### **Frontend & UI Engineering**
+- `frontend-ui-engineering`: Minimalist, human-crafted design language (Linear/Raycast aesthetic, dark-mode zinc palette, zero neon AI badge clutter, accessible WCAG standards).
+- `browser-testing-with-devtools`: Real-browser profiling, console inspection, visual verification.
+
+#### **Security, Performance & Operations**
+- `security-and-hardening`: Defensive boundaries, AST validation, prompt injection defense, sanitized I/O.
+- `performance-optimization`: Profiling, Core Web Vitals, query optimization, bundle reduction.
+- `observability-and-instrumentation`: Structured logging, tracing, metrics, actionable error reporting.
+- `ci-cd-and-automation`, `git-workflow-and-versioning`, `shipping-and-launch`.
 
 ---
 
-## Agent Usage & Guidelines
+### 2. Staff Agent Personas (`.agents/agents/`)
+- **`code-reviewer.md`**: Evaluates changes across 5 dimensions (Correctness, Readability, Architecture, Security, Performance).
+- **`security-auditor.md`**: Dedicated vulnerability detection, threat modeling, and input hardening.
+- **`test-engineer.md`**: Comprehensive test matrices, property testing, and regression analysis.
+- **`web-performance-auditor.md`**: Core Web Vitals, payload profiling, and rendering latency.
 
-See [`AGENTS.md`](./AGENTS.md) for the intent-to-skill execution matrix and anti-rationalization guidelines.
+---
+
+## Engineering Lifecycle
+
+All work adheres to the real-engineering loop:
+
+```text
+SPECIFY (to-spec / spec-driven-development)
+   │
+   ▼
+PLAN (planning-and-task-breakdown)
+   │
+   ▼
+BUILD & TEST (incremental-implementation + tdd)
+   │
+   ▼
+SIMPLIFY (code-simplification)
+   │
+   ▼
+REVIEW & HARDEN (code-review + security-and-hardening)
+   │
+   ▼
+SHIP (shipping-and-launch)
+```
+
+See [`AGENTS.md`](./AGENTS.md) and [`GEMINI.md`](./GEMINI.md) for full configuration details.

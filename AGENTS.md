@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Welcome to **BanKai**. This project is configured with the combined professional engineering skill suites from:
+This project is configured with the combined professional engineering skill suites from:
 - **Addy Osmani** (`addyosmani/agent-skills`): Senior production engineering, performance, clean UI, code simplification, security, and verification.
 - **Matt Pocock** (`mattpocock/skills`): Real engineering, domain modeling, codebase design, deep modules, test-driven development, and architectural rigor.
 

@@ -38,3 +38,4 @@ Thumbs.db
 # Explicitly track agent skills and source libraries
 !.agents/
 !frontend/src/lib/
+
