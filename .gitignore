@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+ENV/
+env/
+
+# Build and Cache
+.next/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+__pycache__/
+*.py[cod]
+
+# Local Databases and Storage
+*.db
+*.sqlite3
+storage/artifacts/*
+!storage/artifacts/.gitkeep
+
+# Environment and Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# System and IDE
+.DS_Store
+Thumbs.db
+*.log
+.turbo/
+
+# Explicitly track agent skills and source libraries
+!.agents/
+!frontend/src/lib/
